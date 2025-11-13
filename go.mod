@@ -12,7 +12,7 @@ require (
 	github.com/goexl/schedule v0.2.3
 	github.com/goexl/task v0.2.8
 	github.com/harluo/di v0.0.5
-	github.com/harluo/migrate v0.2.0
+	github.com/harluo/migrate v0.2.1
 	github.com/harluo/schedule v0.1.6
 	github.com/harluo/xorm v0.0.6
 	xorm.io/builder v0.3.13
@@ -44,21 +44,17 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/harluo/boot v1.7.6 // indirect
 	github.com/harluo/config v0.0.8 // indirect
-	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20251013123823-9fd1530e3ec3 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.19 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
-	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
-	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/olekukonko/cat v0.0.0-20250911104152-50322a0618f6 // indirect
 	github.com/olekukonko/errors v1.1.0 // indirect
 	github.com/olekukonko/ll v0.1.2 // indirect
 	github.com/olekukonko/tablewriter v1.1.1 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
-	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/rs/xid v1.6.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
