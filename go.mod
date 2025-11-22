@@ -12,9 +12,9 @@ require (
 	github.com/goexl/schedule v0.2.3
 	github.com/goexl/task v0.2.8
 	github.com/harluo/di v0.0.5
-	github.com/harluo/migrate v0.2.0
+	github.com/harluo/migrate v0.2.1
 	github.com/harluo/schedule v0.1.6
-	github.com/harluo/xorm v0.0.6
+	github.com/harluo/xorm v0.0.7
 	xorm.io/builder v0.3.13
 )
 
@@ -42,7 +42,7 @@ require (
 	github.com/goexl/xiren v0.0.9 // indirect
 	github.com/golang/snappy v1.0.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/harluo/boot v1.7.6 // indirect
+	github.com/harluo/boot v1.7.8 // indirect
 	github.com/harluo/config v0.0.8 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20251013123823-9fd1530e3ec3 // indirect
@@ -68,7 +68,7 @@ require (
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	github.com/zs5460/art v0.3.0 // indirect
 	go.uber.org/dig v1.19.0 // indirect
-	golang.org/x/crypto v0.44.0 // indirect
+	golang.org/x/crypto v0.45.0 // indirect
 	golang.org/x/net v0.47.0 // indirect
 	golang.org/x/sys v0.38.0 // indirect
 	golang.org/x/text v0.31.0 // indirect
