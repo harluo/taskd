@@ -19,19 +19,19 @@ require (
 )
 
 require (
-	github.com/clipperhouse/displaywidth v0.6.1 // indirect
+	github.com/clipperhouse/displaywidth v0.6.2 // indirect
 	github.com/clipperhouse/stringish v0.1.1 // indirect
 	github.com/clipperhouse/uax29/v2 v2.3.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.7 // indirect
 	github.com/drone/envsubst v1.0.3 // indirect
-	github.com/elliotchance/sshtunnel v1.6.1 // indirect
+	github.com/elliotchance/sshtunnel v1.6.2 // indirect
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.11 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.12 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.28.0 // indirect
+	github.com/go-playground/validator/v10 v10.30.1 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
 	github.com/goexl/baozheng v0.0.1 // indirect
 	github.com/goexl/db v0.0.7 // indirect
