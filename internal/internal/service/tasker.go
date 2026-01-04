@@ -27,7 +27,7 @@ type Tasker struct {
 	id string
 }
 
-func newTasker(tasker get.Tasker) task.Tasker {
+func newTasker(tasker get.Tasker) *Tasker {
 	return &Tasker{
 		schedule: tasker.Schedule,
 		task:     tasker.Task,

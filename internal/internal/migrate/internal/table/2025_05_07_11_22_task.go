@@ -1,4 +1,4 @@
-package migrate
+package table
 
 import (
 	"context"
@@ -8,32 +8,32 @@ import (
 	"github.com/harluo/xorm"
 )
 
-type M1InitTask struct {
+type task struct {
 	engine *xorm.Engine
 }
 
-func newM1InitTask(engine *xorm.Engine) migrate.Migration {
-	return &M1InitTask{
+func NewTask(engine *xorm.Engine) migrate.Migration {
+	return &task{
 		engine: engine,
 	}
 }
 
-func (m *M1InitTask) Upgrade(_ context.Context) error {
+func (m *task) Upgrade(_ context.Context) error {
 	return m.engine.CreateTables(new(model.Task))
 }
 
-func (m *M1InitTask) Downgrade(_ context.Context) error {
+func (m *task) Downgrade(_ context.Context) error {
 	return m.engine.DropTables(new(model.Task))
 }
 
-func (*M1InitTask) Id() uint64 {
+func (*task) Id() uint64 {
 	return 2025_05_07_11_22
 }
 
-func (*M1InitTask) Description() string {
+func (*task) Description() string {
 	return "创建任务调度细节表"
 }
 
-func (*M1InitTask) Version() int {
+func (*task) Version() int {
 	return 2
 }
