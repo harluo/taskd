@@ -8,7 +8,7 @@ require (
 	github.com/goexl/gox v1.9.2
 	github.com/goexl/id v0.1.3
 	github.com/goexl/log v0.1.0
-	github.com/goexl/model v0.1.4
+	github.com/goexl/model v0.1.5
 	github.com/goexl/schedule v0.2.3
 	github.com/goexl/task v0.2.8
 	github.com/harluo/di v0.0.5
