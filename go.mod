@@ -14,7 +14,7 @@ require (
 	github.com/harluo/di v0.0.5
 	github.com/harluo/migrate v0.2.1
 	github.com/harluo/schedule v0.1.6
-	github.com/harluo/xorm v0.0.7
+	github.com/harluo/xorm v0.1.3
 	xorm.io/builder v0.3.13
 )
 
