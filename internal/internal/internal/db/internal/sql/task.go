@@ -82,7 +82,7 @@ func (t *Task) GetsRunnable(excludes ...*model.Task) (tasks *[]*model.Tasker, er
 
 	taskTable := t.engine.TableName(t.table)
 	scheduleTable := t.engine.TableName(new(model.Schedule))
-	session.Join("INNER", scheduleTable, fmt.Sprintf("%s.id = %s.schedule", scheduleTable, taskTable))
+	session.Join(scheduleTable, fmt.Sprintf("%s.id = %s.schedule", scheduleTable, taskTable))
 	err = session.Find(tasks)
 
 	return
