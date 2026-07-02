@@ -104,12 +104,12 @@ func (t *Task) delete(task *model.Task) func(session *xorm.Session) (int64, erro
 	return func(session *xorm.Session) (affected int64, err error) {
 		deleted := new(model.Task)
 		deleted.Id = task.Id
-		if adt, dse := session.Delete(deleted); nil != dse { // 删除计划本身
-			err = dse
-		} else if ads, dte := t.deleteSchedule(session, task); nil != dte { // 删除对应的任务
+		if dta, dte := session.Delete(deleted); nil != dte { // 删除计划本身
 			err = dte
+		} else if dsa, dse := t.deleteSchedule(session, task); nil != dse { // 删除对应的任务
+			err = dse
 		} else {
-			affected = adt + ads
+			affected = dta + dsa
 		}
 
 		return
