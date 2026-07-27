@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/goexl/task"
+	"github.com/harluo/taskd/internal/internal/internal/constant"
 	"github.com/harluo/taskd/internal/internal/internal/model"
 )
 
@@ -47,8 +48,8 @@ func (t *Task) Timeout() time.Duration {
 	return t.task.Timeout
 }
 
-func (t *Task) Data() map[string]any {
-	return t.task.Data
+func (t *Task) Data() any {
+	return t.task.Data[constant.FieldData]
 }
 
 func (t *Task) Next() time.Time {

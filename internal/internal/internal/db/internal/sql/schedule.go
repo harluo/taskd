@@ -70,7 +70,7 @@ func (s *Schedule) add(runtimes *[]*model.Runtime, successes *[]*model.Tasker) f
 			schedules = append(schedules, schedule)
 		}
 
-		if ais, ie := session.Insert(schedules...); nil != ie {
+		if ais, ie := session.Insert(schedules); nil != ie {
 			err = ie
 		} else if aat, ate := s.addTasks(session, runtimes, successes); nil != ate {
 			err = ate
@@ -100,7 +100,7 @@ func (s *Schedule) addTasks(
 		tasks = append(tasks, _task)
 	}
 
-	if affected, err = session.Insert(tasks...); nil == err {
+	if affected, err = session.Insert(tasks); nil == err {
 		s.parseTasks(&tasks, runtimes, successes)
 	}
 
