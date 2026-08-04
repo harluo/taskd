@@ -35,5 +35,5 @@ func (*schedule) Description() string {
 }
 
 func (*schedule) Version() int {
-	return 2
+	return 3
 }

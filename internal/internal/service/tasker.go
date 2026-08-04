@@ -94,7 +94,7 @@ func (t *Tasker) Remove(schedule task.Schedule) (err error) {
 	return
 }
 
-func (t *Tasker) Running(id uint64, status task.Status, times uint32) (err error) {
+func (t *Tasker) Running(id uint64, status task.Status, times uint64) (err error) {
 	_task := new(model.Task)
 	_task.Id = id
 	_task.Status = status

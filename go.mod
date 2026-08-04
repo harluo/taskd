@@ -10,7 +10,7 @@ require (
 	github.com/goexl/log v0.1.0
 	github.com/goexl/model v0.1.5
 	github.com/goexl/schedule v0.2.3
-	github.com/goexl/task v0.2.9
+	github.com/goexl/task v0.3.0
 	github.com/harluo/di v0.0.5
 	github.com/harluo/migrate v0.2.2
 	github.com/harluo/schedule v0.1.6

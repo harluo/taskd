@@ -35,5 +35,5 @@ func (*task) Description() string {
 }
 
 func (*task) Version() int {
-	return 2
+	return 3
 }

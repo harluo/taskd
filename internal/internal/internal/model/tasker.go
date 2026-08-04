@@ -19,18 +19,18 @@ type Tasker struct {
 	// 超时时间
 	Timeout time.Duration `json:"timeout,omitempty"`
 	// 最大重试次数
-	Maximum uint32 `json:"maximum,omitempty"`
+	Maximum uint64 `json:"maximum,omitempty"`
 	// 当前运行次数
-	Times uint32 `json:"times,omitempty"`
+	Times uint64 `json:"times,omitempty"`
 	// 数据
 	Data map[string]any `json:"data,omitempty"`
 
 	// 开始执行时间
-	Start time.Time `json:"start,omitempty"`
+	Start time.Time `json:"start,omitzero"`
 	// 下一次重试时间
-	Next time.Time `json:"next,omitempty"`
+	Next time.Time `json:"next,omitzero"`
 	// 结束时间
-	Stop time.Time `json:"stop,omitempty"`
+	Stop *time.Time `json:"stop,omitempty"`
 	// 状态
 	Status task.Status `json:"status,omitempty"`
 }

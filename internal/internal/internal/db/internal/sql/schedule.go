@@ -3,7 +3,6 @@ package sql
 import (
 	"time"
 
-	"github.com/goexl/id"
 	"github.com/goexl/task"
 	"github.com/harluo/taskd/internal/internal/internal/db/internal/get"
 	"github.com/harluo/taskd/internal/internal/internal/model"
@@ -11,16 +10,14 @@ import (
 )
 
 type Schedule struct {
-	id     id.Generator
 	engine *xorm.Engine
 	tx     *xorm.Tx
 }
 
-func NewSchedule(database get.Tx) *Schedule {
+func NewSchedule(gt get.Tx) *Schedule {
 	return &Schedule{
-		id:     database.Id,
-		engine: database.DB,
-		tx:     database.Tx,
+		engine: gt.Engine,
+		tx:     gt.Tx,
 	}
 }
 
@@ -86,16 +83,19 @@ func (s *Schedule) addTasks(
 	session *xorm.Session,
 	runtimes *[]*model.Runtime, successes *[]*model.Tasker,
 ) (affected int64, err error) {
-	tasks := make([]any, 0, len(*runtimes))
+	tasks := make([]*model.Task, 0, len(*runtimes))
 	for _, runtime := range *runtimes {
-		_task := new(model.Task) // !不用设置标识，通过事件注入
+		_task := new(model.Task)
 		_task.Schedule = runtime.Id
 		_task.Next = runtime.Next
 		_task.Status = task.StatusCreated
 
 		now := time.Now()
 		_task.Start = now
-		_task.Stop = now.Add(runtime.Timeout)
+		if 0 != runtime.Timeout {
+			stop := now.Add(runtime.Timeout)
+			_task.Stop = &stop
+		}
 
 		tasks = append(tasks, _task)
 	}
@@ -115,26 +115,24 @@ func (s *Schedule) deleteTask(session *xorm.Session, schedule *model.Schedule) (
 	return
 }
 
-func (s *Schedule) parseTasks(tasks *[]any, runtimes *[]*model.Runtime, successes *[]*model.Tasker) {
+func (s *Schedule) parseTasks(tasks *[]*model.Task, runtimes *[]*model.Runtime, successes *[]*model.Tasker) {
 	for index, _task := range *tasks {
-		if converted, ok := _task.(*model.Task); ok {
-			success := new(model.Tasker)
-			success.Id = converted.Id
-			success.Start = converted.Start
-			success.Next = converted.Next
-			success.Stop = converted.Stop
-			success.Times = converted.Times
-			success.Status = task.StatusCreated
+		success := new(model.Tasker)
+		success.Id = _task.Id
+		success.Start = _task.Start
+		success.Next = _task.Next
+		success.Stop = _task.Stop
+		success.Times = _task.Times
+		success.Status = task.StatusCreated
 
-			schedule := (*runtimes)[index]
-			success.Target = schedule.Target
-			success.Type = schedule.Type
-			success.Subtype = schedule.Subtype
-			success.Maximum = schedule.Maximum
-			success.Timeout = schedule.Timeout
-			success.Data = schedule.Data
+		schedule := (*runtimes)[index]
+		success.Target = schedule.Target
+		success.Type = schedule.Type
+		success.Subtype = schedule.Subtype
+		success.Maximum = schedule.Maximum
+		success.Timeout = schedule.Timeout
+		success.Data = schedule.Data
 
-			*successes = append(*successes, success)
-		}
+		*successes = append(*successes, success)
 	}
 }

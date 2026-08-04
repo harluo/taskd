@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/goexl/id"
 	"github.com/goexl/task"
 	"github.com/harluo/taskd/internal/internal/internal/db/internal/get"
 	"github.com/harluo/taskd/internal/internal/internal/internal/column"
@@ -14,18 +13,28 @@ import (
 )
 
 type Task struct {
-	id     id.Generator
 	engine *xorm.Engine
 	tx     *xorm.Tx
-	table  *model.Task
+
+	table *model.Task
+	tt    string
+	cso   string
+	cn    string
+	csa   string
+	ct    string
 }
 
 func NewTask(tx get.Tx) *Task {
 	return &Task{
-		id:     tx.Id,
-		engine: tx.DB,
+		engine: tx.Engine,
 		tx:     tx.Tx,
-		table:  new(model.Task),
+
+		table: new(model.Task),
+		tt:    tx.Engine.TableName(new(model.Task)),
+		cso:   tx.Engine.ColumnName(column.Stop),
+		cn:    tx.Engine.ColumnName(column.Next),
+		csa:   tx.Engine.ColumnName(column.Status),
+		ct:    tx.Engine.ColumnName(column.Times),
 	}
 }
 
@@ -42,28 +51,30 @@ func (t *Task) GetsRunnable(excludes ...*model.Task) (tasks *[]*model.Tasker, er
 
 	// 可被运行的条件一：运行时间已到且状态是被认可可被重新执行
 	timeout := builder.Lte{
-		column.Next.String(): now, // 运行时间已到
+		t.cn: now, // 运行时间已到
 	}.And(builder.Eq{
-		column.Status.String(): task.StatusCreated, // 刚创建的任务
+		t.csa: task.StatusCreated, // 刚创建的任务
 	}.Or(builder.Eq{
-		column.Status.String(): task.StatusFailed, // 已经处于错误状态的任务
+		t.csa: task.StatusFailed, // 已经处于错误状态的任务
 	}))
 
 	// 可被运行的条件二：任务已完成执行，但需要重启执行（可被循环执行的任务，达到下一次执行的条件）
 	restarted := builder.Eq{ // 已经完成的任务，需要重新执行
-		column.Status.String(): task.StatusSuccess, // 已完成
+		t.csa: task.StatusSuccess, // 已完成
 	}.And(builder.Eq{
-		column.Times.String(): 0, // 次数被重置
+		t.ct: 0, // 次数被重置
 	})
 
 	// 可被运行的条件三：因各种问题中断执行
-	interrupted := builder.Lte{
-		column.Stop.String(): now, // 超过最大运行时间段
+	interrupted := builder.NotNull{
+		t.cso, // 结束时间有值
+	}.And(builder.Lte{
+		t.cso: now, // 超过最大运行时间段
 	}.And(builder.Eq{
-		column.Status.String(): task.StatusRunning, // 运行中
+		t.csa: task.StatusRunning, // 运行中
 	}.Or(builder.Eq{
-		column.Status.String(): task.StatusRetrying, // 重试中
-	}))
+		t.csa: task.StatusRetrying, // 重试中
+	})))
 
 	// 排除
 	excludeTasks := builder.NewCond()

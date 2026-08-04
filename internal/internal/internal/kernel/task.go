@@ -36,11 +36,11 @@ func (t *Task) Subtype() task.Type {
 	return t.task.Subtype
 }
 
-func (t *Task) Maximum() uint32 {
+func (t *Task) Maximum() uint64 {
 	return t.task.Maximum
 }
 
-func (t *Task) Times() uint32 {
+func (t *Task) Times() uint64 {
 	return t.task.Times
 }
 
