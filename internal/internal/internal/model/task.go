@@ -19,7 +19,7 @@ type Task struct {
 	// 下一次重试时间
 	Next time.Time `xorm:"DATETIME notnull index(next) default(CURRENT_TIMESTAMP) comment(一下次执行时间)" json:"next,omitzero"` // nolint:lll
 	// 结束时间
-	Stop *time.Time `xorm:"DATETIME notnull index(next) default(CURRENT_TIMESTAMP) comment(结束时间)" json:"stop,omitempty"` // nolint:lll
+	Stop *time.Time `xorm:"DATETIME null index(next) comment(结束时间)" json:"stop,omitempty"`
 	// 重试次数
 	Times uint64 `xorm:"BIGINT notnull default(0) comment(重试次数)" json:"times,omitempty"`
 	// 状态
