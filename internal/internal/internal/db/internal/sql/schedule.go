@@ -61,12 +61,12 @@ func (s *Schedule) Delete(ctx context.Context, schedule *model.Schedule) (int64,
 func (s *Schedule) delete(ctx context.Context, schedule *model.Schedule) func(session *xorm.Session) (int64, error) {
 	return func(session *xorm.Session) (affected int64, err error) {
 		session = session.Context(ctx)
-		if ads, tasks, dse := s.deleteSchedule(session, schedule); nil != dse { // 删除计划本身
+		if dsa, tasks, dse := s.deleteSchedule(session, schedule); nil != dse { // 删除计划本身
 			err = dse
-		} else if adt, dte := s.deleteTask(session, tasks); nil != dte { // 删除对应任务
+		} else if dta, dte := session.Context(ctx).Delete(tasks); nil != dte { // 删除对应任务
 			err = dte
 		} else {
-			affected = ads + adt
+			affected = dsa + dta
 		}
 
 		return
@@ -137,22 +137,6 @@ func (s *Schedule) deleteSchedule(
 		}
 		tasks = &deletes
 	}
-
-	return
-}
-
-func (s *Schedule) deleteTask(session *xorm.Session, tasks *[]*model.Task) (affected int64, err error) {
-	if 0 == len(*tasks) {
-		return
-	}
-
-	ids := make([]any, 0, len(*tasks))
-	for _, task := range *tasks {
-		ids = append(ids, task.Schedule)
-	}
-
-	deleted := new(model.Task)
-	affected, err = session.In(column.Schedule, ids...).Delete(deleted)
 
 	return
 }
