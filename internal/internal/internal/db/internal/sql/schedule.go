@@ -61,9 +61,9 @@ func (s *Schedule) Delete(ctx context.Context, schedule *model.Schedule) (int64,
 func (s *Schedule) delete(ctx context.Context, schedule *model.Schedule) func(session *xorm.Session) (int64, error) {
 	return func(session *xorm.Session) (affected int64, err error) {
 		session = session.Context(ctx)
-		if ads, dse := s.deleteSchedule(session, schedule); nil != dse { // 删除计划本身
+		if ads, tasks, dse := s.deleteSchedule(session, schedule); nil != dse { // 删除计划本身
 			err = dse
-		} else if adt, dte := s.deleteTask(session, schedule); nil != dte { // 删除对应任务
+		} else if adt, dte := s.deleteTask(session, tasks); nil != dte { // 删除对应任务
 			err = dte
 		} else {
 			affected = ads + adt
@@ -123,18 +123,33 @@ func (s *Schedule) addTasks(
 }
 
 func (s *Schedule) deleteSchedule(
-	ctx context.Context, session *xorm.Session, schedule *model.Schedule,
+	session *xorm.Session, schedule *model.Schedule,
 ) (affected int64, tasks *[]*model.Task, err error) {
-	deletes:=make([]*model.Schedule,0)
-	s.getSession(ctx, schedule).Find(deletes)
+	schedules := make([]*model.Schedule, 0)
+	if fe := session.Table(s.ts).Where(s.getsCond(schedule)).Find(&schedules); nil != fe {
+		err = fe
+	} else if affected, err = session.Delete(&schedules); nil == err {
+		deletes := make([]*model.Task, 0, len(schedules))
+		for _, matched := range schedules {
+			deleted := new(model.Task)
+			deleted.Schedule = matched.Id
+			deletes = append(deletes, deleted)
+		}
+		tasks = &deletes
+	}
 
 	return
 }
 
-func (s *Schedule) deleteTask(session *xorm.Session, schedule *model.Schedule) (affected int64, err error) {
-	deleted := new(model.Task)
-	deleted.Schedule = schedule.Id
-	affected, err = session.Delete(deleted)
+func (s *Schedule) deleteTask(session *xorm.Session, tasks *[]*model.Task) (affected int64, err error) {
+	for _, task := range *tasks {
+		var count int64
+		if count, err = session.Delete(task); nil != err {
+			affected += count
+			return
+		}
+		affected += count
+	}
 
 	return
 }
