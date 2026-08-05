@@ -1,15 +1,17 @@
 package core
 
 import (
+	"context"
+
 	"github.com/harluo/taskd/internal/internal/internal/model"
 )
 
 type Schedule interface {
-	Add(*model.Runtime, ...*model.Runtime) (*[]*model.Tasker, error)
+	Add(context.Context, *model.Runtime, ...*model.Runtime) (*[]*model.Tasker, error)
 
-	Get(*model.Schedule, ...string) (bool, error)
+	Get(context.Context, *model.Schedule, ...string) (bool, error)
 
-	Update(*model.Schedule, ...string) (int64, error)
+	Update(context.Context, *model.Schedule, ...string) (int64, error)
 
-	Delete(*model.Schedule) (int64, error)
+	Delete(context.Context, *model.Schedule) (int64, error)
 }

@@ -1,12 +1,13 @@
 package sql
 
 import (
+	"context"
 	"fmt"
 	"time"
 
 	"github.com/goexl/task"
+	column2 "github.com/harluo/taskd/internal/internal/internal/db/internal/column"
 	"github.com/harluo/taskd/internal/internal/internal/db/internal/get"
-	"github.com/harluo/taskd/internal/internal/internal/internal/column"
 	"github.com/harluo/taskd/internal/internal/internal/model"
 	"github.com/harluo/xorm"
 	"xorm.io/builder"
@@ -31,22 +32,22 @@ func NewTask(tx get.Tx) *Task {
 
 		table: new(model.Task),
 		tt:    tx.Engine.TableName(new(model.Task)),
-		cso:   tx.Engine.ColumnName(column.Stop),
-		cn:    tx.Engine.ColumnName(column.Next),
-		csa:   tx.Engine.ColumnName(column.Status),
-		ct:    tx.Engine.ColumnName(column.Times),
+		cso:   tx.Engine.ColumnName(column2.Stop),
+		cn:    tx.Engine.ColumnName(column2.Next),
+		csa:   tx.Engine.ColumnName(column2.Status),
+		ct:    tx.Engine.ColumnName(column2.Times),
 	}
 }
 
-func (t *Task) Add(task *model.Task) (affected int64, err error) {
-	return t.engine.InsertOne(task)
+func (t *Task) Add(ctx context.Context, task *model.Task) (affected int64, err error) {
+	return t.engine.Context(ctx).InsertOne(task)
 }
 
-func (t *Task) Get(task *model.Task, columns ...string) (bool, error) {
-	return t.engine.Cols(columns...).Get(task)
+func (t *Task) Get(ctx context.Context, task *model.Task, columns ...string) (bool, error) {
+	return t.engine.Context(ctx).Cols(columns...).Get(task)
 }
 
-func (t *Task) GetsRunnable(excludes ...*model.Task) (tasks *[]*model.Tasker, err error) {
+func (t *Task) GetsRunnable(ctx context.Context, excludes ...*model.Task) (tasks *[]*model.Tasker, err error) {
 	now := time.Now()
 
 	// 可被运行的条件一：运行时间已到且状态是被认可可被重新执行
@@ -82,7 +83,7 @@ func (t *Task) GetsRunnable(excludes ...*model.Task) (tasks *[]*model.Tasker, er
 	excludeTasks := builder.NewCond()
 	for _, exclude := range excludes {
 		excludeTasks = excludeTasks.And(builder.Neq{
-			column.Id.String(): exclude.Id,
+			column2.Id: exclude.Id,
 		})
 	}
 
@@ -90,7 +91,7 @@ func (t *Task) GetsRunnable(excludes ...*model.Task) (tasks *[]*model.Tasker, er
 	tasks = &entities
 	condition := timeout.Or(restarted).Or(interrupted).And(excludeTasks)
 
-	session := t.engine.Table(t.table).Where(condition)
+	session := t.engine.Context(ctx).Table(t.table).Where(condition)
 	session.Limit(1024) // 最大取1024个数据
 
 	taskTable := t.engine.TableName(t.table)
@@ -101,20 +102,21 @@ func (t *Task) GetsRunnable(excludes ...*model.Task) (tasks *[]*model.Tasker, er
 	return
 }
 
-func (t *Task) Update(task *model.Task, columns ...string) (int64, error) {
-	return t.engine.ID(task.Id).MustCols(columns...).Update(task)
+func (t *Task) Update(ctx context.Context, task *model.Task, columns ...string) (int64, error) {
+	return t.engine.Context(ctx).ID(task.Id).MustCols(columns...).Update(task)
 }
 
-func (t *Task) Archive(task *model.Task) (int64, error) {
-	return t.tx.Do(t.delete(task))
+func (t *Task) Archive(ctx context.Context, task *model.Task) (int64, error) {
+	return t.tx.Do(t.delete(ctx, task))
 }
 
-func (t *Task) Delete(task *model.Task) (int64, error) {
-	return t.tx.Do(t.delete(task))
+func (t *Task) Delete(ctx context.Context, task *model.Task) (int64, error) {
+	return t.tx.Do(t.delete(ctx, task))
 }
 
-func (t *Task) delete(task *model.Task) func(session *xorm.Session) (int64, error) {
+func (t *Task) delete(ctx context.Context, task *model.Task) func(session *xorm.Session) (int64, error) {
 	return func(session *xorm.Session) (affected int64, err error) {
+		session = session.Context(ctx)
 		deleted := new(model.Task)
 		deleted.Id = task.Id
 		if dta, dte := session.Delete(deleted); nil != dte { // 删除计划本身

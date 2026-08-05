@@ -75,7 +75,7 @@ func (t *Tasker) Add(required task.Schedule, optionals ...task.Schedule) (err er
 
 		runtimes = append(runtimes, runtime)
 	}
-	if successes, ae := t.schedule.Add(runtimes[0], runtimes[1:]...); nil != ae {
+	if successes, ae := t.schedule.Add(context.Background(), runtimes[0], runtimes[1:]...); nil != ae {
 		err = ae
 	} else {
 		t.runnable.Put((*successes)[0], (*successes)[1:]...)
@@ -87,7 +87,7 @@ func (t *Tasker) Add(required task.Schedule, optionals ...task.Schedule) (err er
 func (t *Tasker) Remove(schedule task.Schedule) (err error) {
 	_schedule := new(model.Schedule)
 	_schedule.Id = schedule.Id()
-	if _, de := t.schedule.Delete(_schedule); nil != de {
+	if _, de := t.schedule.Delete(context.Background(), _schedule); nil != de {
 		err = de
 	}
 
@@ -99,7 +99,7 @@ func (t *Tasker) Running(id uint64, status task.Status, times uint64) (err error
 	_task.Id = id
 	_task.Status = status
 	_task.Times = times
-	if _, ue := t.task.Update(_task); nil != ue {
+	if _, ue := t.task.Update(context.Background(), _task); nil != ue {
 		err = ue
 	}
 
@@ -111,7 +111,7 @@ func (t *Tasker) Update(id uint64, status task.Status, runtime time.Time) (err e
 	_task.Id = id
 	_task.Status = status
 	_task.Next = runtime
-	if _, ue := t.task.Update(_task); nil != ue {
+	if _, ue := t.task.Update(context.Background(), _task); nil != ue {
 		err = ue
 	}
 
@@ -125,11 +125,11 @@ func (t *Tasker) Pop() task.Task {
 func (t *Tasker) Archive(task task.Task) (err error) {
 	_task := new(model.Task)
 	_task.Id = task.Id()
-	if exists, ge := t.task.Get(_task); nil != ge {
+	if exists, ge := t.task.Get(context.Background(), _task); nil != ge {
 		err = ge
 	} else if !exists {
 		err = exception.New().Message("任务不存在").Field(field.New("task", task)).Build()
-	} else if _, ae := t.task.Archive(_task); nil != ae {
+	} else if _, ae := t.task.Archive(context.Background(), _task); nil != ae {
 		err = ae
 	}
 
@@ -141,7 +141,7 @@ func (t *Tasker) Failed(_ task.Task) (err error) {
 }
 
 func (t *Tasker) Run() (err error) {
-	if tasks, re := t.task.GetsRunnable(); nil != re {
+	if tasks, re := t.task.GetsRunnable(context.Background()); nil != re {
 		err = re
 	} else if 0 != len(*tasks) {
 		all := *tasks

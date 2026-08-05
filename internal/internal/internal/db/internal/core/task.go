@@ -1,19 +1,21 @@
 package core
 
 import (
+	"context"
+
 	"github.com/harluo/taskd/internal/internal/internal/model"
 )
 
 type Task interface {
-	Add(task *model.Task) (int64, error)
+	Add(context.Context,  *model.Task) (int64, error)
 
-	Get(task *model.Task, columns ...string) (bool, error)
+	Get(context.Context,  *model.Task,  ...string) (bool, error)
 
-	GetsRunnable(excludes ...*model.Task) (*[]*model.Tasker, error)
+	GetsRunnable(context.Context,  ...*model.Task) (*[]*model.Tasker, error)
 
-	Update(task *model.Task, columns ...string) (int64, error)
+	Update(context.Context,  *model.Task,  ...string) (int64, error)
 
-	Archive(task *model.Task) (int64, error)
+	Archive(context.Context,  *model.Task) (int64, error)
 
-	Delete(task *model.Task) (int64, error)
+	Delete(context.Context,  *model.Task) (int64, error)
 }

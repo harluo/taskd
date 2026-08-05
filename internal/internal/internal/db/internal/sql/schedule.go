@@ -1,55 +1,69 @@
 package sql
 
 import (
+	"context"
 	"time"
 
 	"github.com/goexl/task"
+	"github.com/harluo/taskd/internal/internal/internal/db/internal/column"
 	"github.com/harluo/taskd/internal/internal/internal/db/internal/get"
 	"github.com/harluo/taskd/internal/internal/internal/model"
 	"github.com/harluo/xorm"
+	"xorm.io/builder"
 )
 
 type Schedule struct {
 	engine *xorm.Engine
 	tx     *xorm.Tx
+
+	countBy *model.Schedule
+	ts      string
+	ci      string
+	ct      string
 }
 
 func NewSchedule(gt get.Tx) *Schedule {
 	return &Schedule{
 		engine: gt.Engine,
 		tx:     gt.Tx,
+
+		countBy: new(model.Schedule),
+		ts:      gt.Engine.TableName(new(model.Schedule)),
+		ci:      gt.Engine.ColumnName(column.Id),
+		ct:      gt.Engine.ColumnName(column.Target),
 	}
 }
 
-func (s *Schedule) Add(runtime *model.Runtime, runtimes ...*model.Runtime) (successes *[]*model.Tasker, err error) {
+func (s *Schedule) Add(
+	ctx context.Context, runtime *model.Runtime, runtimes ...*model.Runtime,
+) (successes *[]*model.Tasker, err error) {
 	models := make([]*model.Tasker, 0, 1+len(runtimes))
 	saves := append([]*model.Runtime{runtime}, runtimes...)
-	if _, err = s.tx.Do(s.add(&saves, &models)); nil == err {
+	if _, err = s.tx.Do(s.add(ctx, &saves, &models)); nil == err {
 		successes = &models
 	}
 
 	return
 }
 
-func (s *Schedule) Get(schedule *model.Schedule, columns ...string) (bool, error) {
-	return s.engine.Cols(columns...).Get(schedule)
+func (s *Schedule) Get(ctx context.Context, schedule *model.Schedule, columns ...string) (bool, error) {
+	return s.getSession(ctx, schedule, columns...).Get(schedule)
 }
 
-func (s *Schedule) Update(schedule *model.Schedule, columns ...string) (int64, error) {
-	return s.engine.ID(schedule.Id).MustCols(columns...).Update(schedule)
+func (s *Schedule) Update(ctx context.Context, schedule *model.Schedule, columns ...string) (int64, error) {
+	return s.engine.Context(ctx).ID(schedule.Id).MustCols(columns...).Update(schedule)
 }
 
-func (s *Schedule) Delete(schedule *model.Schedule) (int64, error) {
-	return s.tx.Do(s.delete(schedule))
+func (s *Schedule) Delete(ctx context.Context, schedule *model.Schedule) (int64, error) {
+	return s.tx.Do(s.delete(ctx, schedule))
 }
 
-func (s *Schedule) delete(schedule *model.Schedule) func(session *xorm.Session) (int64, error) {
+func (s *Schedule) delete(ctx context.Context, schedule *model.Schedule) func(session *xorm.Session) (int64, error) {
 	return func(session *xorm.Session) (affected int64, err error) {
-		deleted := new(model.Schedule)
-		deleted.Id = schedule.Id
-		if ads, dse := session.Id(schedule.Id).Delete(deleted); nil != dse { // 删除计划本身
+		session = session.Context(ctx)
+		if ads, dse := s.deleteSchedule(session, schedule); nil != dse { // 删除计划本身
 			err = dse
-		} else if adt, dte := s.deleteTask(session, schedule); nil != dte { // 删除对应的任务
+		} else if adt, dte := s.deleteTask(session, schedule); nil != dte { // 删除对应任务
 			err = dte
 		} else {
 			affected = ads + adt
@@ -59,8 +73,9 @@ func (s *Schedule) delete(schedule *model.Schedule) func(session *xorm.Session) 
 	}
 }
 
-func (s *Schedule) add(runtimes *[]*model.Runtime, successes *[]*model.Tasker) func(session *xorm.Session) (int64, error) {
+func (s *Schedule) add(ctx context.Context, runtimes *[]*model.Runtime, successes *[]*model.Tasker) func(session *xorm.Session) (int64, error) {
 	return func(session *xorm.Session) (affected int64, err error) {
+		session = session.Context(ctx)
 		schedules := make([]any, 0, len(*runtimes))
 		for _, runtime := range *runtimes {
 			schedule := &runtime.Schedule
@@ -107,12 +122,44 @@ func (s *Schedule) addTasks(
 	return
 }
 
+func (s *Schedule) deleteSchedule(
+	ctx context.Context, session *xorm.Session, schedule *model.Schedule,
+) (affected int64, tasks *[]*model.Task, err error) {
+	deletes:=make([]*model.Schedule,0)
+	s.getSession(ctx, schedule).Find(deletes)
+
+	return
+}
+
 func (s *Schedule) deleteTask(session *xorm.Session, schedule *model.Schedule) (affected int64, err error) {
 	deleted := new(model.Task)
 	deleted.Schedule = schedule.Id
 	affected, err = session.Delete(deleted)
 
 	return
+}
+
+func (s *Schedule) getsCond(schedule *model.Schedule) (cond builder.Cond) {
+	cond = builder.NewCond()
+	if schedule.Id != 0 {
+		cond = cond.And(builder.Eq{
+			s.ci: schedule.Id,
+		})
+	}
+	if schedule.Target != 0 {
+		cond = cond.And(builder.Eq{
+			s.ct: schedule.Target,
+		})
+	}
+
+	return
+}
+
+func (s *Schedule) getSession(
+	ctx context.Context,
+	schedule *model.Schedule, columns ...string,
+) *xorm.Session {
+	return s.engine.Context(ctx).Table(s.ts).Cols(columns...).Where(s.getsCond(schedule))
 }
 
 func (s *Schedule) parseTasks(tasks *[]*model.Task, runtimes *[]*model.Runtime, successes *[]*model.Tasker) {
