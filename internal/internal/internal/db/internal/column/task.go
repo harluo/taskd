@@ -1,8 +1,9 @@
 package column
 
 const (
-	Status = "status"
-	Next   = "next"
-	Stop   = "stop"
-	Times  = "times"
+	Schedule = "schedule"
+	Status   = "status"
+	Next     = "next"
+	Stop     = "stop"
+	Times    = "times"
 )

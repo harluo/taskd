@@ -142,14 +142,17 @@ func (s *Schedule) deleteSchedule(
 }
 
 func (s *Schedule) deleteTask(session *xorm.Session, tasks *[]*model.Task) (affected int64, err error) {
-	for _, task := range *tasks {
-		var count int64
-		if count, err = session.Delete(task); nil != err {
-			affected += count
-			return
-		}
-		affected += count
+	if 0 == len(*tasks) {
+		return
 	}
+
+	ids := make([]any, 0, len(*tasks))
+	for _, task := range *tasks {
+		ids = append(ids, task.Schedule)
+	}
+
+	deleted := new(model.Task)
+	affected, err = session.In(column.Schedule, ids...).Delete(deleted)
 
 	return
 }
