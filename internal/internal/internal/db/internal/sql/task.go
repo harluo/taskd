@@ -56,6 +56,8 @@ func (t *Task) GetsRunnable(excludes ...*model.Task) (tasks *[]*model.Tasker, er
 		t.csa: task.StatusCreated, // 刚创建的任务
 	}.Or(builder.Eq{
 		t.csa: task.StatusFailed, // 已经处于错误状态的任务
+	}).Or(builder.Eq{
+		t.csa: task.StatusStandby, // 已执行成功，但需继续执行的任务
 	}))
 
 	// 可被运行的条件二：任务已完成执行，但需要重启执行（可被循环执行的任务，达到下一次执行的条件）
