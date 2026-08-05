@@ -61,9 +61,9 @@ func (s *Schedule) Delete(ctx context.Context, schedule *model.Schedule) (int64,
 func (s *Schedule) delete(ctx context.Context, schedule *model.Schedule) func(session *xorm.Session) (int64, error) {
 	return func(session *xorm.Session) (affected int64, err error) {
 		session = session.Context(ctx)
-		if dsa, tasks, dse := s.deleteSchedule(session, schedule); nil != dse { // 删除计划本身
+		if dsa, tasks, dse := s.deleteSchedule(ctx, session, schedule); nil != dse { // 删除计划本身
 			err = dse
-		} else if dta, dte := session.Context(ctx).Delete(tasks); nil != dte { // 删除对应任务
+		} else if dta, dte := s.deleteTask(session, tasks); nil != dte { // 删除对应任务
 			err = dte
 		} else {
 			affected = dsa + dta
@@ -123,20 +123,42 @@ func (s *Schedule) addTasks(
 }
 
 func (s *Schedule) deleteSchedule(
+	ctx context.Context,
 	session *xorm.Session, schedule *model.Schedule,
 ) (affected int64, tasks *[]*model.Task, err error) {
 	schedules := make([]*model.Schedule, 0)
-	if fe := session.Table(s.ts).Where(s.getsCond(schedule)).Find(&schedules); nil != fe {
+	if fe := session.Context(ctx).Table(s.ts).Where(s.getsCond(schedule)).Find(&schedules); nil != fe {
 		err = fe
-	} else if affected, err = session.Delete(&schedules); nil == err {
+	} else {
+		ids := make([]any, 0, len(schedules))
 		deletes := make([]*model.Task, 0, len(schedules))
 		for _, matched := range schedules {
+			ids = append(ids, matched.Id)
 			deleted := new(model.Task)
 			deleted.Schedule = matched.Id
 			deletes = append(deletes, deleted)
 		}
 		tasks = &deletes
+
+		deleted := new(model.Schedule)
+		affected, err = session.Context(ctx).In(s.ci, ids...).Delete(deleted)
 	}
+
+	return
+}
+
+func (s *Schedule) deleteTask(session *xorm.Session, tasks *[]*model.Task) (affected int64, err error) {
+	if 0 == len(*tasks) {
+		return
+	}
+
+	ids := make([]any, 0, len(*tasks))
+	for _, task := range *tasks {
+		ids = append(ids, task.Schedule)
+	}
+
+	deleted := new(model.Task)
+	affected, err = session.In(column.Schedule, ids...).Delete(deleted)
 
 	return
 }
