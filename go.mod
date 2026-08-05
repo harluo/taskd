@@ -6,15 +6,14 @@ require (
 	github.com/goexl/container v0.0.7
 	github.com/goexl/exception v0.0.4
 	github.com/goexl/gox v1.9.2
-	github.com/goexl/id v0.1.3
 	github.com/goexl/log v0.1.0
 	github.com/goexl/model v0.1.5
 	github.com/goexl/schedule v0.2.3
-	github.com/goexl/task v0.3.0
+	github.com/goexl/task v0.3.2
 	github.com/harluo/di v0.0.5
 	github.com/harluo/migrate v0.2.2
 	github.com/harluo/schedule v0.1.6
-	github.com/harluo/xorm v0.2.9
+	github.com/harluo/xorm v0.3.0
 	xorm.io/builder v0.3.13
 )
 
@@ -39,6 +38,7 @@ require (
 	github.com/goexl/db v0.0.7 // indirect
 	github.com/goexl/env v0.0.2 // indirect
 	github.com/goexl/gfx v0.2.8 // indirect
+	github.com/goexl/id v0.1.3 // indirect
 	github.com/goexl/mengpo v0.3.2 // indirect
 	github.com/goexl/structer v0.2.0 // indirect
 	github.com/goexl/xiren v0.0.9 // indirect
@@ -47,7 +47,7 @@ require (
 	github.com/harluo/boot v1.7.8 // indirect
 	github.com/harluo/config v0.0.8 // indirect
 	github.com/leodido/go-urn v1.5.0 // indirect
-	github.com/lufia/plan9stats v0.0.0-20260627054121-477a66015f15 // indirect
+	github.com/lufia/plan9stats v0.0.0-20260802145828-341c2f0c90b5 // indirect
 	github.com/mattn/go-colorable v0.1.15 // indirect
 	github.com/mattn/go-isatty v0.0.24 // indirect
 	github.com/mattn/go-runewidth v0.0.27 // indirect
