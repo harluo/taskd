@@ -87,6 +87,12 @@ func (t *Tasker) Add(required task.Schedule, optionals ...task.Schedule) (err er
 func (t *Tasker) Remove(schedule task.Schedule) (err error) {
 	_schedule := new(model.Schedule)
 	_schedule.Id = schedule.Id()
+	_schedule.Target = schedule.Target()
+	_schedule.Type = schedule.Type()
+	_schedule.Subtype = schedule.Subtype()
+	_schedule.Maximum = schedule.Maximum()
+	_schedule.Timeout = schedule.Timeout()
+	_schedule.Data = schedule.Data()
 	if _, de := t.schedule.Delete(context.Background(), _schedule); nil != de {
 		err = de
 	}
