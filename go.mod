@@ -9,7 +9,7 @@ require (
 	github.com/goexl/log v0.1.0
 	github.com/goexl/model v0.1.5
 	github.com/goexl/schedule v0.2.3
-	github.com/goexl/task v0.3.2
+	github.com/goexl/task v0.3.3
 	github.com/harluo/di v0.0.5
 	github.com/harluo/migrate v0.2.2
 	github.com/harluo/schedule v0.1.6
@@ -56,7 +56,7 @@ require (
 	github.com/olekukonko/errors v1.3.0 // indirect
 	github.com/olekukonko/ll v0.1.8 // indirect
 	github.com/olekukonko/tablewriter v1.1.4 // indirect
-	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
+	github.com/power-devops/perfstat v0.0.0-20260805114148-88456608a4f6 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/rs/xid v1.6.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
