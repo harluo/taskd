@@ -108,7 +108,7 @@ func (s *Schedule) addTasks(
 		now := time.Now()
 		_task.Start = now
 		if 0 != runtime.Timeout {
-			stop := now.Add(runtime.Timeout)
+			stop := now.Add(runtime.Timeout.Duration())
 			_task.Stop = &stop
 		}
 
@@ -201,7 +201,7 @@ func (s *Schedule) parseTasks(tasks *[]*model.Task, runtimes *[]*model.Runtime, 
 		success.Type = schedule.Type
 		success.Subtype = schedule.Subtype
 		success.Maximum = schedule.Maximum
-		success.Timeout = schedule.Timeout
+		success.Timeout = schedule.Timeout.Duration()
 		success.Data = schedule.Data
 
 		*successes = append(*successes, success)

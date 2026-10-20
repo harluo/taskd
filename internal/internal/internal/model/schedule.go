@@ -1,8 +1,7 @@
 package model
 
 import (
-	"time"
-
+	"github.com/goexl/db"
 	"github.com/goexl/task"
 	"github.com/harluo/xorm"
 )
@@ -17,7 +16,7 @@ type Schedule struct {
 	// 子类型
 	Subtype task.Type `xorm:"SMALLINT notnull index(next) default(0) comment(子类型，根据应用自身识别)" json:"subtype,omitempty"` // nolint:lll
 	// 超时时间
-	Timeout time.Duration `xorm:"BIGINT notnull default(0) comment(任务超时时间)" json:"timeout,omitempty"`
+	Timeout db.Duration `xorm:"BIGINT notnull default(0) comment(任务超时时间)" json:"timeout,omitempty"`
 	// 最大重试次数
 	Maximum uint64 `xorm:"BIGINT notnull default(0) comment(最大重试次数)" json:"maximum,omitempty"`
 	// 数据
