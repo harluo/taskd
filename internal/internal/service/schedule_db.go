@@ -38,9 +38,10 @@ func (t *Tasker) Remove(schedule task.Schedule) (err error) {
 	_schedule.Type = schedule.Type()
 	_schedule.Subtype = schedule.Subtype()
 	_schedule.Maximum = schedule.Maximum()
+	
 	_schedule.Timeout = db.NewDuration(schedule.Timeout())
 	_schedule.Data = schedule.Data()
-	if _, de := t.schedule.Delete(context.Background(), _schedule); nil != de {
+	if _, de := t.schedule.Delete(context.Background(), _schedule); de != nil {
 		err = de
 	}
 
