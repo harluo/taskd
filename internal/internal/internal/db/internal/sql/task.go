@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/goexl/task"
-	column2 "github.com/harluo/taskd/internal/internal/internal/db/internal/column"
+	"github.com/harluo/taskd/internal/internal/internal/db/internal/column"
 	"github.com/harluo/taskd/internal/internal/internal/db/internal/get"
 	"github.com/harluo/taskd/internal/internal/internal/model"
 	"github.com/harluo/xorm"
@@ -19,6 +19,7 @@ type Task struct {
 
 	table *model.Task
 	tt    string
+	ci    string
 	cso   string
 	cn    string
 	csa   string
@@ -32,10 +33,11 @@ func NewTask(tx get.Tx) *Task {
 
 		table: new(model.Task),
 		tt:    tx.Engine.TableName(new(model.Task)),
-		cso:   tx.Engine.ColumnName(column2.Stop),
-		cn:    tx.Engine.ColumnName(column2.Next),
-		csa:   tx.Engine.ColumnName(column2.Status),
-		ct:    tx.Engine.ColumnName(column2.Times),
+		ci:    tx.Engine.ColumnName(column.Id),
+		cso:   tx.Engine.ColumnName(column.Stop),
+		cn:    tx.Engine.ColumnName(column.Next),
+		csa:   tx.Engine.ColumnName(column.Status),
+		ct:    tx.Engine.ColumnName(column.Times),
 	}
 }
 
@@ -48,7 +50,7 @@ func (t *Task) Get(ctx context.Context, task *model.Task, columns ...string) (bo
 }
 
 func (t *Task) GetsRunnable(ctx context.Context, excludes ...*model.Task) (tasks *[]*model.Tasker, err error) {
-	now := time.Now()
+	now := time.Now().Format("2006-01-02 15:04:05.999999")
 
 	// 可被运行的条件一：运行时间已到且状态是被认可可被重新执行
 	timeout := builder.Lte{
@@ -83,7 +85,7 @@ func (t *Task) GetsRunnable(ctx context.Context, excludes ...*model.Task) (tasks
 	excludeTasks := builder.NewCond()
 	for _, exclude := range excludes {
 		excludeTasks = excludeTasks.And(builder.Neq{
-			column2.Id: exclude.Id,
+			t.ci: exclude.Id,
 		})
 	}
 
